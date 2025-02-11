@@ -24,7 +24,7 @@
 
 1. Clone repository:
 ```bash
-git clone [repository-url]
+git clone https://github.com/teera04164/board-api-nestjs
 cd [project-name]
 ```
 
