@@ -73,7 +73,6 @@ yarn start:prod
 - **@nestjs/common, @nestjs/core**: Framework หลักสำหรับการพัฒนา
 - **@nestjs/typeorm, typeorm**: ORM สำหรับจัดการฐานข้อมูล
 - **@nestjs/jwt, passport-jwt**: ระบบยืนยันตัวตนด้วย JWT
-- **@nestjs/cache-manager**: ระบบ caching
 - **class-validator, class-transformer**: การตรวจสอบและแปลงข้อมูล
 
 ### การพัฒนา
