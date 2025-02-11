@@ -90,17 +90,6 @@ yarn start:prod
 # รันทดสอบทั้งหมด
 yarn test
 
-# รันทดสอบแบบ watch mode
-yarn test:watch
-
-# รันทดสอบพร้อมดู coverage
-yarn test:cov
-```
-
-### E2E Tests
-รันการทดสอบ End-to-End:
-```bash
-yarn test:e2e
 ```
 
 ## API Endpoints
@@ -131,3 +120,9 @@ yarn test:e2e
 ### Users
 - `GET /users`: ดูรายการผู้ใช้ทั้งหมด
 - `POST /users`: สร้างผู้ใช้ใหม่
+
+
+### สิ่งที่ imprement เพิ่ม
+- ทำ seed data ข้อมูล post comment user
+
+### โปร Feedback การส่งงานของผมด้วยครับ
