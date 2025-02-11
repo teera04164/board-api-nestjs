@@ -146,4 +146,18 @@ export class PostsService {
     return post;
   }
 
+  async update(id: string, updatePostDto: UpdatePostDto, user: any) {
+    const post = await this.findOne(id);
+
+    if (post.user.id !== user.id) {
+      throw new ForbiddenException('You can only update your own posts');
+    }
+
+    const comunity = await this.communityRepository.findOne({
+      where: { id: updatePostDto.communityId },
+    });
+
+    Object.assign(post, { ...updatePostDto, community: comunity });
+    return this.postRepository.save(post);
+  }
 }

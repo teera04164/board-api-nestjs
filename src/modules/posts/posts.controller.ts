@@ -15,6 +15,7 @@ import {
 } from '@nestjs/common';
 import { PostsService } from './posts.service';
 import { CreatePostDto } from './dto/create-post.dto';
+import { UpdatePostDto } from './dto/update-post.dto';
 import { SearchPostDto } from './dto/search-post.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { CurrentUser } from 'src/decorators/current-user.decorator';
@@ -41,4 +42,19 @@ export class PostsController {
     return this.postsService.create(createPostDto, user);
   }
 
+  @UseGuards(JwtAuthGuard)
+  @Put(':id')
+  async update(
+    @Param('id') id: string,
+    @Body() updatePostDto: UpdatePostDto,
+    @CurrentUser() user,
+  ) {
+    const post = await this.postsService.findOne(id);
+
+    if (post.user.id !== user.id) {
+      throw new UnauthorizedException('You can only update your own posts');
+    }
+
+    return this.postsService.update(id, updatePostDto, user);
+  }
 }
