@@ -1,73 +1,133 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="200" alt="Nest Logo" /></a>
-</p>
+# Webboard API
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+## สถาปัตยกรรมของแอปพลิเคชัน
 
-## Description
+โปรเจคนี้ใช้สถาปัตยกรรมแบบ Modular โดยแบ่งเป็นส่วนหลักๆ ดังนี้:
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+- **Controllers**: จัดการ HTTP requests และ responses
+- **Services**: จัดการ business logic
+- **Entities**: โมเดลข้อมูลสำหรับฐานข้อมูล
+- **DTOs**: Data Transfer Objects สำหรับการรับ-ส่งข้อมูล
+- **Guards**: ระบบรักษาความปลอดภัยและการยืนยันตัวตน
+- **Pipes**: การตรวจสอบและแปลงข้อมูล
+- **Database**: PostgreSQL สำหรับเก็บข้อมูล
 
-## Installation
+## การติดตั้งและการใช้งาน
 
+### ความต้องการเบื้องต้น
+- Node.js (version 18 หรือสูงกว่า)
+- Docker และ Docker Compose
+- Yarn หรือ npm
+
+### ขั้นตอนการติดตั้ง
+
+1. Clone repository:
 ```bash
-$ yarn install
+git clone [repository-url]
+cd [project-name]
 ```
 
-## Running the app
-
+2. ติดตั้ง dependencies:
 ```bash
-# development
-$ yarn run start
+yarn install
+```
 
-# watch mode
-$ yarn run start:dev
+3. สร้างไฟล์ .env หรือ copy .env.example และกำหนดค่าต่างๆ:
+```env
+NODE_ENV=development
+PORT=5002
+
+DB_HOST=localhost
+DB_PORT=5432
+DB_USERNAME=postgres
+DB_PASSWORD=postgres
+DB_DATABASE=webboard
+
+JWT_ACCESS_SECRET=secret_key
+JWT_ACCESS_EXPIRED_IN=60m
+```
+
+4. รัน Docker containers สำหรับ PostgreSQL
+```bash
+docker-compose up -d
+```
+
+5. รัน database migrations และ seeds:
+```bash
+yarn seed:refresh
+```
+
+6. รันแอปพลิเคชัน:
+```bash
+# development mode
+yarn start:dev
 
 # production mode
-$ yarn run start:prod
+yarn start:prod
 ```
 
-## Test
+## ไลบรารีและแพ็คเกจที่ใช้
 
+### หลัก
+- **@nestjs/common, @nestjs/core**: Framework หลักสำหรับการพัฒนา
+- **@nestjs/typeorm, typeorm**: ORM สำหรับจัดการฐานข้อมูล
+- **@nestjs/jwt, passport-jwt**: ระบบยืนยันตัวตนด้วย JWT
+- **@nestjs/cache-manager**: ระบบ caching
+- **class-validator, class-transformer**: การตรวจสอบและแปลงข้อมูล
+
+### การพัฒนา
+- **@faker-js/faker**: สร้างข้อมูลจำลองสำหรับ seeding
+- **jest**: ระบบทดสอบ
+- **typescript**: ภาษาที่ใช้ในการพัฒนา
+- **prettier, eslint**: เครื่องมือจัดรูปแบบโค้ด
+
+## การทดสอบ
+
+### Unit Tests
+รันการทดสอบ:
 ```bash
-# unit tests
-$ yarn run test
+# รันทดสอบทั้งหมด
+yarn test
 
-# e2e tests
-$ yarn run test:e2e
+# รันทดสอบแบบ watch mode
+yarn test:watch
 
-# test coverage
-$ yarn run test:cov
+# รันทดสอบพร้อมดู coverage
+yarn test:cov
 ```
 
-## Support
+### E2E Tests
+รันการทดสอบ End-to-End:
+```bash
+yarn test:e2e
+```
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+## API Endpoints
 
-## Stay in touch
+### Authentication
+- `POST /auth/register`: ลงทะเบียนผู้ใช้ใหม่
+- `POST /auth/login`: เข้าสู่ระบบ
+- `GET /auth/me`: ดูข้อมูลผู้ใช้ปัจจุบัน
 
-- Author - [Kamil Myśliwiec](https://kamilmysliwiec.com)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+### Communities
+- `GET /communities`: ดูรายการชุมชนทั้งหมด
+- `GET /communities/:id`: ดูข้อมูลชุมชน
+- `POST /communities`: สร้างชุมชนใหม่
 
-## License
+### Posts
+- `GET /posts`: ดูรายการโพสต์ทั้งหมด
+- `GET /posts/:id`: ดูข้อมูลโพสต์
+- `POST /posts`: สร้างโพสต์ใหม่
+- `PUT /posts/:id`: แก้ไขโพสต์
+- `DELETE /posts/:id`: ลบโพสต์
 
-Nest is [MIT licensed](LICENSE).
+### Posts Comment
+- `POST /posts/:postId/comments` เพิ่ม comment ไปยัง post
+- `GET  /posts/:postId/comments` get comment ทั้งหมดใน post
+- `PUT  /posts/:postId/comments/commentId` แก้ไข comment
+- `DELETE /posts/:postId/comments/commentId` ลบ comment
+
+### Users
+- `GET /users`: ดูรายการผู้ใช้ทั้งหมด
+- `POST /users`: สร้างผู้ใช้ใหม่
