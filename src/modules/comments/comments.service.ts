@@ -51,6 +51,18 @@ export class CommentsService {
     };
   }
 
+  async findOne(id: string): Promise<Comment> {
+    const comment = await this.commentRepository.findOne({
+      where: { id },
+      relations: ['user'],
+    });
+
+    if (!comment) {
+      throw new NotFoundException('Comment not found');
+    }
+
+    return comment;
+  }
 
   async update(
     id: string,

@@ -52,4 +52,10 @@ export class CommentsController {
   ) {
     return this.commentsService.update(id, updateCommentDto, user.id);
   }
+
+  @UseGuards(JwtAuthGuard)
+  @Delete(':id')
+  remove(@Param('id') id: string, @CurrentUser() user) {
+    return this.commentsService.remove(id, user.id);
+  }
 }
