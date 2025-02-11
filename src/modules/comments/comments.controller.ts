@@ -29,6 +29,20 @@ export class CommentsController {
     return this.commentsService.create(postId, createCommentDto, user.id);
   }
 
+  @Get()
+  findAll(
+    @Param('postId') postId: string,
+    @Query('page') page: number = 1,
+    @Query('limit') limit: number = 10,
+  ) {
+    return this.commentsService.findAll(postId, page, limit);
+  }
+
+  @Get(':id')
+  findOne(@Param('id') id: string) {
+    return this.commentsService.findOne(id);
+  }
+
   @UseGuards(JwtAuthGuard)
   @Put(':id')
   update(

@@ -29,6 +29,28 @@ export class CommentsService {
     return this.commentRepository.save(comment);
   }
 
+  async findAll(postId: string, page: number = 1, limit: number = 10) {
+    page = 1;
+    limit = 10;
+
+    const [comments, total] = await this.commentRepository.findAndCount({
+      where: { postId },
+      relations: ['user'],
+      order: { createdAt: 'DESC' },
+      skip: (page - 1) * limit,
+      take: limit,
+    });
+
+    return {
+      comments,
+      pagination: {
+        total,
+        page,
+        totalPages: Math.ceil(total / limit),
+      },
+    };
+  }
+
 
   async update(
     id: string,
