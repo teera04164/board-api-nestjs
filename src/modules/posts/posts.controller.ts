@@ -57,4 +57,17 @@ export class PostsController {
 
     return this.postsService.update(id, updatePostDto, user);
   }
+
+  @UseGuards(JwtAuthGuard)
+  @Delete(':id')
+  async remove(@Param('id') id: string, @CurrentUser() user) {
+    const post = await this.postsService.findOne(id);
+
+    if (post.user.id !== user.id) {
+      throw new ForbiddenException('You can only delete your own posts');
+    }
+
+    return this.postsService.remove(id, user);
+  }
+
 }

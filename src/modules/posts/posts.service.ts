@@ -160,4 +160,15 @@ export class PostsService {
     Object.assign(post, { ...updatePostDto, community: comunity });
     return this.postRepository.save(post);
   }
+
+  async remove(id: string, user: any) {
+    const post = await this.findOne(id);
+
+    if (post.user.id !== user.id) {
+      throw new ForbiddenException('You can only delete your own posts');
+    }
+
+    await this.postRepository.remove(post);
+    return { message: 'Post deleted successfully' };
+  }
 }
