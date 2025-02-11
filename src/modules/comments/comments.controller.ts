@@ -11,6 +11,7 @@ import {
 } from '@nestjs/common';
 import { CommentsService } from './comments.service';
 import { CreateCommentDto } from './dto/create-comment.dto';
+import { UpdateCommentDto } from './dto/update-comment.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { CurrentUser } from 'src/decorators/current-user.decorator';
 
@@ -26,5 +27,15 @@ export class CommentsController {
     @CurrentUser() user,
   ) {
     return this.commentsService.create(postId, createCommentDto, user.id);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Put(':id')
+  update(
+    @Param('id') id: string,
+    @Body() updateCommentDto: UpdateCommentDto,
+    @CurrentUser() user,
+  ) {
+    return this.commentsService.update(id, updateCommentDto, user.id);
   }
 }
