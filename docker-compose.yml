@@ -1,0 +1,23 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:13-alpine
+    container_name: webboard_postgres
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: webboard
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - webboard_network
+
+volumes:
+  postgres_data:
+
+networks:
+  webboard_network:
+    driver: bridge
