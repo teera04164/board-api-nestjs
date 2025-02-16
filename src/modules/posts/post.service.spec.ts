@@ -49,6 +49,10 @@ const queryBuilderMock = {
   take: jest.fn().mockReturnThis(),
   andWhere: jest.fn().mockReturnThis(),
   getRawMany: jest.fn().mockResolvedValue([]),
+  getCount: jest.fn().mockResolvedValue(0),
+  addGroupBy: jest.fn().mockReturnThis(),
+  offset: jest.fn().mockReturnThis(),
+  limit: jest.fn().mockReturnThis(),
 };
 
 const mockRepositories = {
@@ -66,6 +70,7 @@ const mockRepositories = {
   },
   comment: {
     find: jest.fn(),
+    count: jest.fn(),
   },
 };
 
@@ -162,6 +167,7 @@ describe('PostsService', () => {
 
     it('should return paginated posts with comment counts', async () => {
       queryBuilderMock.getRawMany.mockResolvedValue([mockRawPost]);
+      queryBuilderMock.getCount.mockResolvedValue(1);
       mockRepositories.post.count.mockResolvedValue(1);
 
       const result = await service.findAll(defaultSearchDto);
