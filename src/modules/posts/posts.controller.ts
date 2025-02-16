@@ -8,10 +8,7 @@ import {
   Param,
   Query,
   UseGuards,
-  UnauthorizedException,
-  UsePipes,
-  ValidationPipe,
-  ForbiddenException,
+  UnauthorizedException, ForbiddenException
 } from '@nestjs/common';
 import { PostsService } from './posts.service';
 import { CreatePostDto } from './dto/create-post.dto';
@@ -19,16 +16,23 @@ import { UpdatePostDto } from './dto/update-post.dto';
 import { SearchPostDto } from './dto/search-post.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { CurrentUser } from 'src/decorators/current-user.decorator';
-import { SearchQueryPipe } from './pipes/search-query.pipe';
 
 @Controller('posts')
 export class PostsController {
-  constructor(private readonly postsService: PostsService) {}
+  constructor(private readonly postsService: PostsService) { }
 
   @Get()
-  @UsePipes(new ValidationPipe({ transform: true }), SearchQueryPipe)
   async findAll(@Query() searchPostDto: SearchPostDto) {
     return this.postsService.findAll(searchPostDto);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('me')
+  async getCurrentUserPosts(
+    @CurrentUser() user,
+    @Query() searchPostDto: SearchPostDto,
+  ) {
+    return this.postsService.findByUser(user.id,searchPostDto);
   }
 
   @Get(':id')

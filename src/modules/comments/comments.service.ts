@@ -30,9 +30,6 @@ export class CommentsService {
   }
 
   async findAll(postId: string, page: number = 1, limit: number = 10) {
-    page = 1;
-    limit = 10;
-
     const [comments, total] = await this.commentRepository.findAndCount({
       where: { postId },
       relations: ['user'],
