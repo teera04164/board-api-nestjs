@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Community } from './entities/community.entity';
@@ -20,10 +20,16 @@ export class CommunitiesService {
   }
 
   async findOne(id: string) {
-    return this.communityRepository.findOne({
+    const result = await this.communityRepository.findOne({
       where: { id },
       relations: ['posts'],
     });
+
+    if (!result) {
+      throw new NotFoundException('Post not found');
+    }
+
+    return result;
   }
 
   async create(createCommunityDto: CreateCommunityDto) {
