@@ -1,9 +1,7 @@
 # Webboard API
 
 
-## สถาปัตยกรรมของแอปพลิเคชัน
-
-โปรเจคนี้ใช้สถาปัตยกรรมแบบ Modular โดยแบ่งเป็นส่วนหลักๆ ดังนี้:
+## Application Architecture
 
 - **Controllers**: จัดการ HTTP requests และ responses
 - **Services**: จัดการ business logic
@@ -74,6 +72,7 @@ yarn start:prod
 - **@nestjs/typeorm, typeorm**: ORM สำหรับจัดการฐานข้อมูล
 - **@nestjs/jwt, passport-jwt**: ระบบยืนยันตัวตนด้วย JWT
 - **class-validator, class-transformer**: การตรวจสอบและแปลงข้อมูล
+- **pg**: PostgreSQL Client
 
 ### การพัฒนา
 - **@faker-js/faker**: สร้างข้อมูลจำลองสำหรับ seeding
@@ -105,6 +104,7 @@ yarn test
 
 ### Posts
 - `GET /posts`: ดูรายการโพสต์ทั้งหมด
+- `POST /posts/me`: ดูรายการโพสต์ทั้งหมดของตัวเอง
 - `GET /posts/:id`: ดูข้อมูลโพสต์
 - `POST /posts`: สร้างโพสต์ใหม่
 - `PUT /posts/:id`: แก้ไขโพสต์
