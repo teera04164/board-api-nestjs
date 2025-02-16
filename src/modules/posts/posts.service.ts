@@ -4,7 +4,7 @@ import {
   ForbiddenException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, SelectQueryBuilder } from 'typeorm';
 import { Post } from './entities/post.entity';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
@@ -39,7 +39,8 @@ export class PostsService {
     return this.postRepository.save(post);
   }
 
-  async findAll(SearchPostDto: SearchPostDto) {
+  private createQueryForPosts(searchPostDto: SearchPostDto, userId?: string) {
+    const offset = (searchPostDto.page - 1) * searchPostDto.limit;
     const queryBuilder = this.postRepository
       .createQueryBuilder('post')
       .leftJoinAndSelect('post.user', 'user')
@@ -59,26 +60,42 @@ export class PostsService {
         'community.name',
       ])
       .addSelect('COUNT(DISTINCT comments.id)', 'commentCount')
-      .groupBy('post.id, user.id, community.id')
-      .orderBy('post.createdAt', 'DESC')
-      .skip((SearchPostDto.page - 1) * SearchPostDto.limit)
-      .take(SearchPostDto.limit);
+      .groupBy('post.id')
+      .addGroupBy('user.id')
+      .addGroupBy('community.id')
+      .orderBy('post.createdAt', 'DESC');
 
-    if (SearchPostDto.search) {
+    if (searchPostDto.search) {
       queryBuilder.andWhere(
         'post.title LIKE :search OR post.content LIKE :search',
-        { search: `%${SearchPostDto.search}%` },
+        { search: `%${searchPostDto.search}%` },
       );
     }
 
-    if (SearchPostDto.communityId) {
+    if (searchPostDto.communityId) {
       queryBuilder.andWhere('post.communityId = :communityId', {
-        communityId: SearchPostDto.communityId,
+        communityId: searchPostDto.communityId,
       });
     }
 
-    const postsRaw = await queryBuilder.getRawMany();
-    const total = await this.postRepository.count();
+    if (userId) {
+      queryBuilder.andWhere('post.userId = :userId', {
+        userId,
+      });
+    }
+
+    queryBuilder.offset(offset).limit(searchPostDto.limit);
+    return queryBuilder;
+  }
+
+  private async fetchPostsData(
+    searchPostDto: SearchPostDto,
+    queryBuilder: SelectQueryBuilder<Post>,
+  ) {
+    const [postsRaw, total] = await Promise.all([
+      queryBuilder.getRawMany(),
+      queryBuilder.getCount(),
+    ]);
 
     const postsWithCommentCount = postsRaw.map((post) => ({
       id: post.post_id,
@@ -106,44 +123,41 @@ export class PostsService {
       posts: postsWithCommentCount,
       pagination: {
         total,
-        page: SearchPostDto.page,
-        totalPages: Math.ceil(total / SearchPostDto.limit),
+        page: searchPostDto.page,
+        totalPages: Math.ceil(total / searchPostDto.limit),
       },
     };
   }
 
-  async findByUser(
-    userId: string,
-    { page, limit }: { page: number; limit: number },
-  ) {
-    const [posts, total] = await this.postRepository.findAndCount({
-      where: { user: { id: userId } },
-      skip: (page - 1) * limit,
-      take: limit,
-      order: { createdAt: 'DESC' },
-    });
+  async findAll(searchPostDto: SearchPostDto) {
+    const queryBuilder = this.createQueryForPosts(searchPostDto);
+    return this.fetchPostsData(searchPostDto, queryBuilder);
+  }
 
-    return {
-      posts,
-      pagination: {
-        total,
-        page,
-        totalPages: Math.ceil(total / limit),
-      },
-    };
+  async findByUser(userId: string, searchPostDto: SearchPostDto) {
+    const queryBuilder = this.createQueryForPosts(searchPostDto, userId);
+    return this.fetchPostsData(searchPostDto, queryBuilder);
   }
 
   async findOne(id: string) {
-    const post = await this.postRepository.findOne({
-      where: { id },
-      relations: ['user', 'community'],
-    });
+    const [post, commentCount] = await Promise.all([
+      this.postRepository.findOne({
+        where: { id },
+        relations: ['user', 'community'],
+      }),
+      this.commentRepository.count({
+        where: { post: { id } },
+      }),
+    ]);
 
     if (!post) {
       throw new NotFoundException('Post not found');
     }
 
-    return post;
+    return {
+      ...post,
+      commentCount,
+    };
   }
 
   async update(id: string, updatePostDto: UpdatePostDto, user: any) {
@@ -170,5 +184,24 @@ export class PostsService {
 
     await this.postRepository.remove(post);
     return { message: 'Post deleted successfully' };
+  }
+
+  async getComments(postId: string, { page = 1, limit = 10 }) {
+    const [comments, total] = await this.commentRepository.findAndCount({
+      where: { post: { id: postId } },
+      relations: ['user'],
+      order: { createdAt: 'DESC' },
+      skip: (page - 1) * limit,
+      take: limit,
+    });
+
+    return {
+      comments,
+      pagination: {
+        total,
+        page,
+        totalPages: Math.ceil(total / limit),
+      },
+    };
   }
 }
